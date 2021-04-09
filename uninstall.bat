@@ -1,0 +1,3 @@
+docker stop smartmoney_challenge
+docker container rm smartmoney_challenge
+docker image rm smartmoney_challenge
