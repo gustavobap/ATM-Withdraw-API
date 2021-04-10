@@ -36,7 +36,14 @@ public class WithdrawService {
 	@Transactional
 	public Withdraw save(Withdraw withdraw) {
 
-		User user = userRepository.findByEmail(withdraw.getUser().getEmail());
+		Optional<User> optional = userRepository.findByEmail(withdraw.getUser().getEmail());
+		
+		if(optional.isEmpty()) {
+			throw new BusinessException("user", "User not found");
+		}
+		
+		User user = optional.get();
+		
 		withdraw.setUser(user);
 
 		repository.lockByUser(user.getId());

@@ -55,6 +55,17 @@ public class WithdrawServiceTests extends BaseTest {
 		Assertions.assertEquals(6, withdrawRepository.countByUser(user));
 		Assertions.assertEquals(5, service.countLast24Hours(user));
 	}
+	
+	@Test
+	public void validateUserEmailExists() {
+		Withdraw withdraw = TestHelper.newWithdraw(TestHelper.newUser("non.existant"));
+		
+		BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
+			service.save(withdraw);
+		});
+		
+		Assertions.assertEquals("User not found", exception.getMessage());
+	}
 
 	private BigDecimal big(String value) {
 		return new BigDecimal(value);
