@@ -48,7 +48,7 @@ public class UserController extends ApplicationController {
     }
     
 	@GetMapping()
-	public ResponseEntity<List<User>> listAll() {
+	public ResponseEntity<List<User>> list() {
 		List<User> users = repository.findAll();
 		return ResponseEntity.ok().body(users);
 	}
