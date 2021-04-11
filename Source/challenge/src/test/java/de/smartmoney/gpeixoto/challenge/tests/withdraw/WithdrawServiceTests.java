@@ -53,7 +53,6 @@ public class WithdrawServiceTests extends BaseTest {
 		service.save(TestHelper.newWithdraw(user));
 
 		Assertions.assertEquals(6, withdrawRepository.countByUser(user));
-		Assertions.assertEquals(5, service.countLast24Hours(user));
 	}
 	
 	@Test

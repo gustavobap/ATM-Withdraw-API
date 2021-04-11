@@ -28,7 +28,7 @@ public class WithdrawController extends ApplicationController {
 	
     @GetMapping("{id}")
     public ResponseEntity<Withdraw> find(@PathVariable("id") Long id) {
-        Optional<Withdraw> withdraw = service.findById(id);
+        Optional<Withdraw> withdraw = service.find(id);
         return ResponseEntity.of(withdraw);
     }
     

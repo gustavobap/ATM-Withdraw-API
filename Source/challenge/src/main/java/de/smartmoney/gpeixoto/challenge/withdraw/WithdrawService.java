@@ -24,13 +24,8 @@ public class WithdrawService {
 		this.userRepository = userRepository;
 	}
 
-	public Optional<Withdraw> findById(Long id) {
+	public Optional<Withdraw> find(Long id) {
 		return repository.findById(id);
-	}
-
-	public Long countLast24Hours(User user) {
-		Instant after = Instant.now().minus(24, ChronoUnit.HOURS);
-		return repository.countByUserAndCreatedDateAfter(user, after);
 	}
 
 	@Transactional
@@ -72,6 +67,11 @@ public class WithdrawService {
 		withdraw.setFee(feeValue(withdraw, percentage));
 
 		return repository.save(withdraw);
+	}
+	
+	private Long countLast24Hours(User user) {
+		Instant after = Instant.now().minus(24, ChronoUnit.HOURS);
+		return repository.countByUserAndCreatedDateAfter(user, after);
 	}
 	
 	private Boolean isValueGreater(Withdraw withdraw, String value) {
