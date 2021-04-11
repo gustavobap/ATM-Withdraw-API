@@ -50,8 +50,9 @@ public class WithdrawService {
 
 		Long count = repository.countByUser(user);
 
-		if (count == 0 && withdraw.getValue().compareTo(new BigDecimal("50.00")) > 0) {
-			throw new BusinessException("value", "Your first withdraw is limited to $50.00");
+		String firstMinimum = "50.00";
+		if (count == 0 && isValueGreater(withdraw, firstMinimum)) {
+			throw new BusinessException("value", "Your first withdraw is limited to $" + firstMinimum);
 		}
 
 		if (countLast24Hours(user) >= 5) {
@@ -60,16 +61,28 @@ public class WithdrawService {
 
 		Integer percentage;
 
-		if (withdraw.getValue().compareTo(new BigDecimal("100.99")) <= 0) {
+		if (isValueEqualOrLess(withdraw, "100.99")) {
 			percentage = 3;
-		} else if (withdraw.getValue().compareTo(new BigDecimal("250.99")) <= 0) {
+		} else if (isValueEqualOrLess(withdraw, "250.99")) {
 			percentage = 2;
 		} else {
 			percentage = 1;
 		}
-
-		withdraw.setFee(withdraw.getValue().multiply(new BigDecimal(percentage)).divide(new BigDecimal(100)));
+		
+		withdraw.setFee(feeValue(withdraw, percentage));
 
 		return repository.save(withdraw);
+	}
+	
+	private Boolean isValueGreater(Withdraw withdraw, String value) {
+		return withdraw.getValue().compareTo(new BigDecimal(value)) > 0;
+	}
+	
+	private Boolean isValueEqualOrLess(Withdraw withdraw, String value) {
+		return withdraw.getValue().compareTo(new BigDecimal(value)) <= 0;
+	}
+	
+	private BigDecimal feeValue(Withdraw withdraw, Integer percentage) {
+		return withdraw.getValue().multiply(new BigDecimal(percentage)).divide(new BigDecimal(100));
 	}
 }
