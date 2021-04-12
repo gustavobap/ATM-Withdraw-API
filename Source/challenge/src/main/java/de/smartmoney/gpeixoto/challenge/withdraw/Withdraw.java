@@ -3,7 +3,9 @@ package de.smartmoney.gpeixoto.challenge.withdraw;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Random;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,9 +13,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.NaturalId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,7 +27,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.smartmoney.gpeixoto.challenge.user.User;
 
 @Entity
-@JsonPropertyOrder({ "createdDate", "value", "fee" })
+@JsonPropertyOrder({ "code", "createdDate", "value", "fee" })
+@Table(uniqueConstraints = @UniqueConstraint(name = "WITHDRAW_UNIQUE_CODE_CONSTRAINT", columnNames = { "code" }))
 public class Withdraw {
 
 	@Id
@@ -29,17 +36,24 @@ public class Withdraw {
 	@JsonIgnore
 	private Long id;
 	
+	@NaturalId
+	@Column(nullable = false)
+	private Long code;
+	
 	@NotNull(message="A value must be specified")
 	@Min(value = 1, message="must be greater than or equal to $1.00")
 	@Max(value = 300, message="Your withdrawals are limited to $300.00")
+	@Column(nullable = false)
 	private BigDecimal value;
 	
+	@Column(nullable = false)
 	private BigDecimal fee;
 	
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
+    @Column(nullable = false)
     private Instant createdDate;
     
 	public Withdraw() {
@@ -52,6 +66,14 @@ public class Withdraw {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public Long getCode() {
+		return code;
+	}
+	
+	public void setCode(Long code) {
+		this.code = code;
 	}
 
 	public User getUser() {
@@ -84,7 +106,10 @@ public class Withdraw {
 	
     @PrePersist
     public void prePersist() {
-    	this.createdDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    	Instant now = Instant.now();
+    	//Database is limited to millisecond precision
+    	this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
+    	this.code = new Random().nextLong();
     }
     
 	public void setCreatedDate(Instant createdDate) {

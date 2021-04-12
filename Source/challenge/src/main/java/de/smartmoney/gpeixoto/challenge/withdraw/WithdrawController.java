@@ -27,9 +27,9 @@ public class WithdrawController extends ApplicationController {
 		this.service = service;
 	}
 	
-    @GetMapping("{id}")
-    public ResponseEntity<Withdraw> find(@PathVariable("id") Long id) {
-        Optional<Withdraw> withdraw = service.find(id);
+    @GetMapping("{code}")
+    public ResponseEntity<Withdraw> find(@PathVariable("code") Long code) {
+        Optional<Withdraw> withdraw = service.find(code);
         return ResponseEntity.of(withdraw);
     }
     
@@ -39,7 +39,7 @@ public class WithdrawController extends ApplicationController {
     	withdraw = service.save(withdraw);
     	
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
+                .path("/{code}")
                 .buildAndExpand(withdraw.getId())
                 .toUri();
         

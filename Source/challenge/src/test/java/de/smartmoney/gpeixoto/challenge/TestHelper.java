@@ -37,6 +37,10 @@ public class TestHelper {
 	    
 		ObjectNode node = mapper.createObjectNode();
 
+		if(withdraw.getCode() != null) {
+			node.put("code", withdraw.getCode());
+		}
+		
 		if(withdraw.getCreatedDate() != null) {
 			//TODO specify date format explicitly
 			node.put("createdDate", withdraw.getCreatedDate().toString());

@@ -15,8 +15,8 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import de.smartmoney.gpeixoto.challenge.UnitTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
+import de.smartmoney.gpeixoto.challenge.UnitTest;
 import de.smartmoney.gpeixoto.challenge.shared.BusinessException;
 import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;

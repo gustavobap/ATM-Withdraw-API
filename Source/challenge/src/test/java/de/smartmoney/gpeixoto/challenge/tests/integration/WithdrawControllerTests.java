@@ -51,12 +51,12 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 	private MockHttpServletResponse find(Withdraw withdraw) throws IOException, Exception {
 		return mvc.perform(
-				MockMvcRequestBuilders.get("/api/withdrawals/" + withdraw.getId()).accept(MediaType.APPLICATION_JSON))
+				MockMvcRequestBuilders.get("/api/withdrawals/" + withdraw.getCode()).accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
 	}
 
 	@Test
-	public void canGetWithdrawById() throws Exception {
+	public void canGetWithdrawByCode() throws Exception {
 
 		Withdraw expected = repository.save(validWithdraw);
 

@@ -25,8 +25,8 @@ public class WithdrawService {
 		this.userRepository = userRepository;
 	}
 
-	public Optional<Withdraw> find(Long id) {
-		return repository.findById(id);
+	public Optional<Withdraw> find(Long code) {
+		return repository.findByCode(code);
 	}
 
 	@Transactional
