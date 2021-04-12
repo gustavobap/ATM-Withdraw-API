@@ -107,9 +107,7 @@ public class Withdraw {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof Withdraw))
 			return false;
 		Withdraw other = (Withdraw) obj;
 		if (createdDate == null) {
@@ -139,6 +137,6 @@ public class Withdraw {
 			return false;
 		return true;
 	}
-	
+
 	
 }

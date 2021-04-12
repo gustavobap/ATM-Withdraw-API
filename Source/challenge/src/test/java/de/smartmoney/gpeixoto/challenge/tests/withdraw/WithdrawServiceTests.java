@@ -3,10 +3,16 @@ package de.smartmoney.gpeixoto.challenge.tests.withdraw;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.smartmoney.gpeixoto.challenge.BaseTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
@@ -19,15 +25,40 @@ import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawService;
 
 public class WithdrawServiceTests extends BaseTest {
 
-	@Autowired
-	private WithdrawService service;
-
-	@Autowired
+	@Mock
 	private UserRepository userRespository;
 
-	@Autowired
+	@Mock
 	private WithdrawRepository withdrawRepository;
+	
+	private WithdrawService service;
+	
+	@BeforeEach
+	public void init() {
+		service = new WithdrawService(withdrawRepository, userRespository);
+	}
 
+	@Test
+	public void listWithdraws() throws JsonProcessingException {
+
+		User userA = TestHelper.newUser("a");
+		User userB = TestHelper.newUser("b");
+
+		Withdraw a = TestHelper.newWithdraw(userA);
+		Withdraw b = TestHelper.newWithdraw(userB);
+		List<Withdraw> mockResult = new ArrayList<Withdraw>();
+		mockResult.add(a);
+		mockResult.add(b);
+		
+		Mockito.when(withdrawRepository.findAll()).thenReturn(mockResult);
+		
+		List<Withdraw> list = service.list();
+		
+		Assertions.assertEquals(2, list.size());
+		Assertions.assertEquals(a, list.get(0));
+		Assertions.assertEquals(b, list.get(1));
+	}
+	
 	@Test()
 	public void validateDailyLimit() {
 		User user = TestHelper.newUser("a");

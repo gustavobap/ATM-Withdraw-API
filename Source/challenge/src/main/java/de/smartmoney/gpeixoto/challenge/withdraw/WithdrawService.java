@@ -3,6 +3,7 @@ package de.smartmoney.gpeixoto.challenge.withdraw;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -19,7 +20,7 @@ public class WithdrawService {
 	private final WithdrawRepository repository;
 	private final UserRepository userRepository;
 	
-	public WithdrawService(UserRepository userRepository, WithdrawRepository repository) {
+	public WithdrawService(WithdrawRepository repository, UserRepository userRepository) {
 		this.repository = repository;
 		this.userRepository = userRepository;
 	}
@@ -67,6 +68,10 @@ public class WithdrawService {
 		withdraw.setFee(feeValue(withdraw, percentage));
 
 		return repository.save(withdraw);
+	}
+	
+	public List<Withdraw> list() {
+		return repository.findAll();
 	}
 	
 	private Long countLast24Hours(User user) {

@@ -1,6 +1,7 @@
 package de.smartmoney.gpeixoto.challenge.withdraw;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -43,6 +44,11 @@ public class WithdrawController extends ApplicationController {
                 .toUri();
         
         return ResponseEntity.created(location).body(withdraw);
+	}
+    
+	@GetMapping()
+	public ResponseEntity<List<Withdraw>> list() {
+		return ResponseEntity.ok().body(service.list());
 	}
 
 }
