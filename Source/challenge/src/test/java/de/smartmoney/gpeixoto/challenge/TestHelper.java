@@ -70,7 +70,7 @@ public class TestHelper {
 		    node.set("user", user);
 	    }
 	    
-	    return mapper.writeValueAsString(node);
+	    return write(node);
 	}
 	
 	private static String expectedDecimal(BigDecimal value) {
@@ -83,7 +83,7 @@ public class TestHelper {
 	    node.put("email", user.getEmail());
 	    node.put("name", user.getName());
 
-	    return mapper.writeValueAsString(node);
+	    return write(node);
 	}
 	
 	public static String expectedJson(String ... nameValuePairs) throws JsonProcessingException {
@@ -97,7 +97,11 @@ public class TestHelper {
 	    	node.put(nameValuePairs[i], nameValuePairs[i+1]);
 	    }
 	    
-	    return mapper.writeValueAsString(node);
+	    return write(node);
+	}
+	
+	private static String write(ObjectNode node) throws JsonProcessingException {
+		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
 	}
 
 }
