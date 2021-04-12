@@ -55,6 +55,7 @@ public class UserController extends ApplicationController {
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ResponseEntity<Map<String, String>> handleConstraintExceptions(DataIntegrityViolationException ex) {
         Map<String, String> map = new HashMap<>(1);
+        //TODO create a parameter specifically for this check
         if(ex.getMostSpecificCause().getMessage().contains(User.UNIQUE_EMAIL_CONSTRAINT_NAME)) {
         	map.put("email", "e-mail is already registered");
         }
