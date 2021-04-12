@@ -1,4 +1,4 @@
-package de.smartmoney.gpeixoto.challenge.tests.withdraw;
+package de.smartmoney.gpeixoto.challenge.tests.integration;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -12,14 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import de.smartmoney.gpeixoto.challenge.ControllerTests;
+import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;
 import de.smartmoney.gpeixoto.challenge.withdraw.Withdraw;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 
-public class WithdrawControllerTests extends ControllerTests {
+public class WithdrawControllerTests extends IntegrationTest {
 
 	@Autowired
 	private WithdrawRepository repository;

@@ -1,4 +1,4 @@
-package de.smartmoney.gpeixoto.challenge.tests.withdraw;
+package de.smartmoney.gpeixoto.challenge.tests.unit;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import de.smartmoney.gpeixoto.challenge.BaseTest;
+import de.smartmoney.gpeixoto.challenge.UnitTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.shared.BusinessException;
 import de.smartmoney.gpeixoto.challenge.user.User;
@@ -24,7 +24,7 @@ import de.smartmoney.gpeixoto.challenge.withdraw.Withdraw;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawService;
 
-public class WithdrawServiceTests extends BaseTest {
+public class WithdrawServiceTests extends UnitTest {
 
 	@Mock
 	private UserRepository userRespository;

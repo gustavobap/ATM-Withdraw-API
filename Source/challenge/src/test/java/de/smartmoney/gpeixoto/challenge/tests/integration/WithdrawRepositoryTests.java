@@ -1,17 +1,17 @@
-package de.smartmoney.gpeixoto.challenge.tests.withdraw;
+package de.smartmoney.gpeixoto.challenge.tests.integration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.smartmoney.gpeixoto.challenge.BaseTest;
+import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;
 import de.smartmoney.gpeixoto.challenge.withdraw.Withdraw;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 
-public class WithdrawRepositoryTests extends BaseTest {
+public class WithdrawRepositoryTests extends IntegrationTest {
 
 	@Autowired
 	private WithdrawRepository repository;

@@ -1,4 +1,4 @@
-package de.smartmoney.gpeixoto.challenge.tests.user;
+package de.smartmoney.gpeixoto.challenge.tests.integration;
 
 import java.io.IOException;
 
@@ -11,12 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import de.smartmoney.gpeixoto.challenge.ControllerTests;
+import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;
 
-public class UserControllerTests extends ControllerTests {
+public class UserControllerTests extends IntegrationTest {
 
 	@Autowired
 	private UserRepository respository;
