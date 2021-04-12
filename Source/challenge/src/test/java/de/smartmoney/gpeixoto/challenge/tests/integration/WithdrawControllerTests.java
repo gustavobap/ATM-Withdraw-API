@@ -88,7 +88,9 @@ public class WithdrawControllerTests extends IntegrationTest {
 	public void validateAttributesPresence() throws Exception {
 		MockHttpServletResponse response = create(new Withdraw());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"value\":\"A value must be specified\"}", response.getContentAsString());
+		
+		Assertions.assertEquals(TestHelper.expectedJson("value", "A value must be specified"), 
+				response.getContentAsString());
 	}
 
 	@Test
@@ -100,7 +102,8 @@ public class WithdrawControllerTests extends IntegrationTest {
 		MockHttpServletResponse response = create(withdraw);
 
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"value\":\"must be greater than or equal to $1.00\"}",
+		
+		Assertions.assertEquals(TestHelper.expectedJson("value", "must be greater than or equal to $1.00"), 
 				response.getContentAsString());
 	}
 
@@ -111,9 +114,10 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 		MockHttpServletResponse response = create(validWithdraw);
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"value\":\"Your first withdraw is limited to $50.00\"}",
-				response.getContentAsString());
 
+		Assertions.assertEquals(TestHelper.expectedJson("value", "Your first withdraw is limited to $50.00"), 
+				response.getContentAsString());
+		
 		validWithdraw.setValue(new BigDecimal("50.00"));
 
 		response = create(validWithdraw);
@@ -123,7 +127,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 		response = create(validWithdraw);
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"value\":\"Your withdrawals are limited to $300.00\"}",
+		Assertions.assertEquals(TestHelper.expectedJson("value", "Your withdrawals are limited to $300.00"),
 				response.getContentAsString());
 
 		validWithdraw.setValue(new BigDecimal("300.00"));

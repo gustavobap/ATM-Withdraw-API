@@ -2,6 +2,7 @@ package de.smartmoney.gpeixoto.challenge;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.InvalidParameterException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,6 +83,20 @@ public class TestHelper {
 	    node.put("email", user.getEmail());
 	    node.put("name", user.getName());
 
+	    return mapper.writeValueAsString(node);
+	}
+	
+	public static String expectedJson(String ... nameValuePairs) throws JsonProcessingException {
+	    ObjectNode node = mapper.createObjectNode();
+	    
+	    if(nameValuePairs.length % 2 != 0) {
+	    	throw new InvalidParameterException();
+	    }
+	    
+	    for(int i = 0; i < nameValuePairs.length; i+=2) {
+	    	node.put(nameValuePairs[i], nameValuePairs[i+1]);
+	    }
+	    
 	    return mapper.writeValueAsString(node);
 	}
 

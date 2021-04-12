@@ -63,8 +63,10 @@ public class UserControllerTests extends IntegrationTest {
 	public void validateAttributesPresence() throws Exception {
 		MockHttpServletResponse response = create(new User());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"name\":\"A name must be specified\",\"email\":\"An e-mail must be specified\"}",
-				response.getContentAsString());
+		
+		String expected = TestHelper.expectedJson("name", "A name must be specified", "email", "An e-mail must be specified");
+		
+		Assertions.assertEquals(expected, response.getContentAsString());
 	}
 
 	@Test
@@ -76,8 +78,10 @@ public class UserControllerTests extends IntegrationTest {
 
 		MockHttpServletResponse response = create(user);
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"name\":\"A name must be specified\",\"email\":\"An e-mail must be specified\"}",
-				response.getContentAsString());
+		
+		String expected = TestHelper.expectedJson("name", "A name must be specified", "email", "An e-mail must be specified");
+		
+		Assertions.assertEquals(expected, response.getContentAsString());
 	}
 
 	@Test
@@ -87,7 +91,9 @@ public class UserControllerTests extends IntegrationTest {
 
 		MockHttpServletResponse response = create(validUser);
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"email\":\"must be a well-formed email address\"}", response.getContentAsString());
+				
+		Assertions.assertEquals(TestHelper.expectedJson("email", "must be a well-formed email address"), 
+				response.getContentAsString());
 	}
 
 	@Test
@@ -101,6 +107,8 @@ public class UserControllerTests extends IntegrationTest {
 
 		MockHttpServletResponse response = create(user);
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		Assertions.assertEquals("{\"email\":\"e-mail is already registered\"}", response.getContentAsString());
+		
+		Assertions.assertEquals(TestHelper.expectedJson("email", "e-mail is already registered"), 
+				response.getContentAsString());
 	}
 }
