@@ -33,6 +33,7 @@ public class WithdrawServiceTests extends BaseTest {
 	private WithdrawRepository withdrawRepository;
 	
 	private WithdrawService service;
+	
 	private User validUser;
 	private User nonExistantUser;
 	
