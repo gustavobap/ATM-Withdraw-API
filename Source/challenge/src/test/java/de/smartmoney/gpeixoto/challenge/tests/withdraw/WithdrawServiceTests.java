@@ -2,13 +2,14 @@ package de.smartmoney.gpeixoto.challenge.tests.withdraw;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -32,10 +33,32 @@ public class WithdrawServiceTests extends BaseTest {
 	private WithdrawRepository withdrawRepository;
 	
 	private WithdrawService service;
+	private User validUser;
+	private User nonExistantUser;
 	
 	@BeforeEach
 	public void init() {
 		service = new WithdrawService(withdrawRepository, userRespository);
+		
+		validUser = TestHelper.newUser("test");
+		validUser.setId(123L);
+		mockUserFinders(validUser, Optional.of(validUser));
+		
+		nonExistantUser = TestHelper.newUser("non.existant");
+		nonExistantUser.setId(9999L);
+		mockUserFinders(nonExistantUser, Optional.empty());
+	}
+	
+	private void mockUserFinders(User user, Optional<User> mockResult) {
+		Mockito.when(userRespository.findByEmail(user.getEmail())).thenReturn(mockResult);
+		Mockito.when(userRespository.findById(user.getId())).thenReturn(mockResult);	
+	}
+	
+	private void assertBusinessException(String message, Executable executable) {
+		BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
+			executable.execute();
+		});
+		Assertions.assertEquals(message, exception.getMessage());
 	}
 
 	@Test
@@ -59,81 +82,63 @@ public class WithdrawServiceTests extends BaseTest {
 		Assertions.assertEquals(b, list.get(1));
 	}
 	
+
+	
 	@Test()
 	public void validateDailyLimit() {
-		User user = TestHelper.newUser("a");
-		Withdraw last = null;
-		userRespository.save(user);
+		
+		Mockito.when(withdrawRepository.countByUserAndCreatedDateAfter(Mockito.any(User.class), Mockito.any(Instant.class)))
+			.thenReturn(4L);
 
-		for (int i = 0; i < 5; i++) {
-			last = service.save(TestHelper.newWithdraw(user));
-		}
-
-		Assertions.assertEquals(5, withdrawRepository.countByUser(user));
-
-		BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
-			service.save(TestHelper.newWithdraw(user));
+		service.save(TestHelper.newWithdraw(validUser));
+		
+		
+		Mockito.when(withdrawRepository.countByUserAndCreatedDateAfter(Mockito.any(User.class), Mockito.any(Instant.class)))
+			.thenReturn(5L);
+		
+		assertBusinessException("You have reached the daily withdrawals limit", () -> {
+			service.save(TestHelper.newWithdraw(validUser));
 		});
-
-		Assertions.assertEquals("You have reached the daily withdrawals limit", exception.getMessage());
-
-		last.setCreatedDate(Instant.now().minus(24, ChronoUnit.HOURS));
-
-		withdrawRepository.save(last);
-
-		service.save(TestHelper.newWithdraw(user));
-
-		Assertions.assertEquals(6, withdrawRepository.countByUser(user));
 	}
 	
 	@Test
 	public void validateUserEmailExists() {
-		Withdraw withdraw = TestHelper.newWithdraw(TestHelper.newUser("non.existant"));
-		
-		BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
-			service.save(withdraw);
+		assertBusinessException("User not found", () -> {
+			service.save(TestHelper.newWithdraw(nonExistantUser));
 		});
-		
-		Assertions.assertEquals("User not found", exception.getMessage());
 	}
-
-	private BigDecimal big(String value) {
-		return new BigDecimal(value);
+	
+	private void checkFeeValue(String withdrawValue, String expectedFeeValue, Integer count) {
+		Withdraw withdraw = TestHelper.newWithdraw(validUser, withdrawValue);
+		Mockito.when(withdrawRepository.countByUser(validUser))
+			.thenReturn(count.longValue());
+		Mockito.when(withdrawRepository.countByUserAndCreatedDateAfter(Mockito.any(User.class), Mockito.any(Instant.class)))
+			.thenReturn(count.longValue());
+		Assertions.assertEquals(new BigDecimal(expectedFeeValue), service.save(withdraw).getFee());
 	}
 
 	@Test()
 	public void setFeeAmount() {
+		
+		Mockito.when(withdrawRepository.save(Mockito.any(Withdraw.class))).thenAnswer(i -> i.getArguments()[0]);
 
-		User user = TestHelper.newUser("test");
-		userRespository.save(user);
+		checkFeeValue("50.00", "1.50", 1);
+		checkFeeValue("100.99", "3.0297", 2);
+		checkFeeValue("101.00", "2.02", 3);
+		checkFeeValue("250.99", "5.0198", 4);
+		checkFeeValue("251.00", "2.51", 4);
+		checkFeeValue("300.00", "3.00", 4);
+	}
+	
+	@Test
+	public void validateMaximumFirstValue(){
+	
+		Mockito.when(withdrawRepository.countByUser(validUser)).thenReturn(0L);
+		assertBusinessException("Your first withdraw is limited to $50.00", () -> {
+			service.save(TestHelper.newWithdraw(validUser, "50.01"));
+		});
 
-		Withdraw withdraw = TestHelper.newWithdraw(user, "50.00");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("1.50"), withdraw.getFee());
-
-		withdraw = TestHelper.newWithdraw(user, "100.99");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("3.0297"), withdraw.getFee());
-
-		withdraw = TestHelper.newWithdraw(user, "101.00");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("2.02"), withdraw.getFee());
-
-		withdraw = TestHelper.newWithdraw(user, "250.99");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("5.0198"), withdraw.getFee());
-
-		withdraw.setCreatedDate(Instant.now().minus(24, ChronoUnit.HOURS));
-		service.save(withdraw);
-
-		withdraw = TestHelper.newWithdraw(user, "251.00");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("2.51"), withdraw.getFee());
-
-		withdraw = TestHelper.newWithdraw(user, "300.00");
-		withdraw = service.save(withdraw);
-		Assertions.assertEquals(big("3.00"), withdraw.getFee());
-
+		service.save(TestHelper.newWithdraw(validUser, "50.00"));
 	}
 
 }
