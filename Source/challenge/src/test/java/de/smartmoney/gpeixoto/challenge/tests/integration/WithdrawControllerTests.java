@@ -73,15 +73,37 @@ public class WithdrawControllerTests extends IntegrationTest {
 		return mvc.perform(
 				MockMvcRequestBuilders.post("/api/withdrawals")
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(TestHelper.expectedJson(withdraw))
+					.content(TestHelper.expectedJson(withdraw, false))
 				)
 				.andReturn().getResponse();
 	}
-
+	
 	@Test
 	public void canCreateWithdraw() throws Exception {
 		MockHttpServletResponse response = create(validWithdraw);
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+	}
+	
+	@Test()
+	public void setFeeAmount() throws Exception {
+		validWithdraw.setValue(new BigDecimal("50.00"));
+		MockHttpServletResponse response = create(validWithdraw);
+		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());		
+
+		Assertions.assertEquals(1, repository.count());		
+		Withdraw withdraw = repository.findAll().get(0);
+		Assertions.assertEquals(new BigDecimal("1.50000"), withdraw.getFee());
+	}
+	
+	@Test()
+	public void setFeeAmountWithBigPrecision() throws Exception {
+		validWithdraw.setValue(new BigDecimal("43.99"));
+		MockHttpServletResponse response = create(validWithdraw);
+		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());		
+
+		Assertions.assertEquals(1, repository.count());
+		Withdraw withdraw = repository.findAll().get(0);
+		Assertions.assertEquals(new BigDecimal("1.31970"), withdraw.getFee());
 	}
 
 	@Test
@@ -104,6 +126,19 @@ public class WithdrawControllerTests extends IntegrationTest {
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
 		Assertions.assertEquals(TestHelper.expectedJson("value", "must be greater than or equal to $1.00"), 
+				response.getContentAsString());
+	}
+	
+	@Test
+	public void validateValuePrecision() throws Exception {
+		User user = userRespository.save(validUser);
+
+		Withdraw withdraw = TestHelper.newWithdraw(user, "40.999");
+		MockHttpServletResponse response = create(withdraw);
+
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+		
+		Assertions.assertEquals(TestHelper.expectedJson("value", "scale must be of 2 decimal places"), 
 				response.getContentAsString());
 	}
 

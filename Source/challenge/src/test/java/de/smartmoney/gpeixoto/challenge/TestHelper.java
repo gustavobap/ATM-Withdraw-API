@@ -43,6 +43,10 @@ public class TestHelper {
 	}
 	
 	public static String expectedJson(Withdraw withdraw) throws JsonProcessingException {
+		return expectedJson(withdraw, true);
+	}
+	
+	public static String expectedJson(Withdraw withdraw, Boolean roundDecimals) throws JsonProcessingException {
 	    
 		ObjectNode node = mapper.createObjectNode();
 
@@ -55,10 +59,10 @@ public class TestHelper {
 			node.put("createdDate", withdraw.getCreatedDate().toString());
 		}
 		if(withdraw.getValue() != null) {
-			node.putRawValue("value", new RawValue(expectedDecimal(withdraw.getValue())));
+			node.putRawValue("value", new RawValue(expectedWithdrawValue(withdraw, roundDecimals)));
 		}
 		if(withdraw.getFee() != null) {
-			node.putRawValue("fee", new RawValue(expectedDecimal(withdraw.getFee())));
+			node.putRawValue("fee", new RawValue(expectedFeeValue(withdraw, roundDecimals)));
 		}
 	   
 	    if(withdraw.getUser() != null) {
@@ -73,8 +77,18 @@ public class TestHelper {
 	    return write(node);
 	}
 	
-	private static String expectedDecimal(BigDecimal value) {
-		return value.setScale(2, RoundingMode.DOWN).toString();
+	private static String expectedWithdrawValue(Withdraw withdraw, Boolean roundDecimals) {
+		BigDecimal value = withdraw.getValue();
+		if(roundDecimals)
+			value = value.setScale(2, RoundingMode.HALF_EVEN);
+		return value.toString();
+	}
+
+	private static String expectedFeeValue(Withdraw withdraw, Boolean roundDecimals) {
+		BigDecimal value = withdraw.getFee();
+		if(roundDecimals)
+			value = value.setScale(5, RoundingMode.HALF_EVEN);
+		return value.toString();
 	}
 
 	public static String expectedJson(User user) throws JsonProcessingException {

@@ -123,6 +123,7 @@ public class WithdrawServiceTests extends UnitTest {
 		
 		Mockito.when(withdrawRepository.save(Mockito.any(Withdraw.class))).thenAnswer(i -> i.getArguments()[0]);
 
+		checkFeeValue("43.99", "1.3197", 1);
 		checkFeeValue("50.00", "1.50", 1);
 		checkFeeValue("100.99", "3.0297", 2);
 		checkFeeValue("101.00", "2.02", 3);

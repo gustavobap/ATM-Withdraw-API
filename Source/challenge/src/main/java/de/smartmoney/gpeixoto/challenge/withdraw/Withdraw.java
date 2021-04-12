@@ -13,8 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.NaturalId;
@@ -29,34 +30,35 @@ import de.smartmoney.gpeixoto.challenge.user.User;
 public class Withdraw {
 
 	private static final AtomicLong codeGenerator = new AtomicLong(Instant.now().getNano());
-	
+
 	@Id
 	@GeneratedValue
 	@JsonIgnore
 	private Long id;
-	
+
 	@NaturalId
 	@Column(nullable = false, unique = true)
 	private Long code;
-	
-	@NotNull(message="A value must be specified")
-	@Min(value = 1, message="must be greater than or equal to $1.00")
-	@Max(value = 300, message="Your withdrawals are limited to $300.00")
-	@Column(nullable = false)
+
+	@NotNull(message = "A value must be specified")
+	@DecimalMin(value = "1", message = "must be greater than or equal to $1.00")
+	@DecimalMax(value = "300", message = "Your withdrawals are limited to $300.00")
+	@Digits(integer = 3, fraction = 2, message = "scale must be of 2 decimal places")
+	@Column(nullable = false, precision = 5, scale = 2)
 	private BigDecimal value;
-	
-	@Column(nullable = false)
+
+	@Column(nullable = false, precision = 8, scale = 5)
 	private BigDecimal fee;
-	
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @Column(nullable = false)
-    private Instant createdDate;
-    
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
+
+	@Column(nullable = false)
+	private Instant createdDate;
+
 	public Withdraw() {
-		
+
 	}
 
 	public Long getId() {
@@ -66,11 +68,11 @@ public class Withdraw {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public Long getCode() {
 		return code;
 	}
-	
+
 	public void setCode(Long code) {
 		this.code = code;
 	}
@@ -78,7 +80,7 @@ public class Withdraw {
 	public User getUser() {
 		return user;
 	}
-	
+
 	public void setUser(User user) {
 		this.user = user;
 	}
@@ -98,19 +100,19 @@ public class Withdraw {
 	public void setFee(BigDecimal fee) {
 		this.fee = fee;
 	}
-	
+
 	public Instant getCreatedDate() {
 		return createdDate;
 	}
-	
-    @PrePersist
-    public void prePersist() {
-    	Instant now = Instant.now();
-    	//Database is limited to millisecond precision
-    	this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
-    	this.code = codeGenerator.incrementAndGet();
-    }
-    
+
+	@PrePersist
+	public void prePersist() {
+		Instant now = Instant.now();
+		// Database is limited to millisecond precision
+		this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
+		this.code = codeGenerator.incrementAndGet();
+	}
+
 	public void setCreatedDate(Instant createdDate) {
 		this.createdDate = createdDate;
 	}
@@ -162,5 +164,4 @@ public class Withdraw {
 		return true;
 	}
 
-	
 }
