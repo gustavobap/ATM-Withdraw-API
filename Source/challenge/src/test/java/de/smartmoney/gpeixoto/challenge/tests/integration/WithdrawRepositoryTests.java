@@ -28,23 +28,34 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 		User userB = TestHelper.newUser("b");
 		userRespository.save(userB);
 
-		repository.save(TestHelper.newWithdraw(userA));
-		repository.save(TestHelper.newWithdraw(userA));
-		repository.save(TestHelper.newWithdraw(userB));
+		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50"));
+		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50"));
+		repository.save(TestHelper.newWithdraw(userB, "50.00", "1.50"));
 
 		Assertions.assertEquals(2L, repository.countByUser(userA));
 		Assertions.assertEquals(1L, repository.countByUser(userB));
 	}
 
 	@Test
-	public void canCreateTimestamps() throws Exception {
+	public void registerCreatedDate() throws Exception {
 		User user = TestHelper.newUser("a");
 		userRespository.save(user);
 
-		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user));
+		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
 		withdraw = repository.findById(withdraw.getId()).get();
 
 		Assertions.assertNotNull(withdraw.getCreatedDate());
 	}
+	
+	@Test
+	public void registerCreatedCode() throws Exception {
+		User user = TestHelper.newUser("a");
+		userRespository.save(user);
+
+		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
+		withdraw = repository.findById(withdraw.getId()).get();
+
+		Assertions.assertNotNull(withdraw.getCode());
+	}	
 
 }

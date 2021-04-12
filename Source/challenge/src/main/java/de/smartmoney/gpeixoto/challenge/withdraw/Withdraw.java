@@ -3,7 +3,7 @@ package de.smartmoney.gpeixoto.challenge.withdraw;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -28,16 +26,17 @@ import de.smartmoney.gpeixoto.challenge.user.User;
 
 @Entity
 @JsonPropertyOrder({ "code", "createdDate", "value", "fee" })
-@Table(uniqueConstraints = @UniqueConstraint(name = "WITHDRAW_UNIQUE_CODE_CONSTRAINT", columnNames = { "code" }))
 public class Withdraw {
 
+	private static final AtomicLong codeGenerator = new AtomicLong(Instant.now().getNano());
+	
 	@Id
 	@GeneratedValue
 	@JsonIgnore
 	private Long id;
 	
 	@NaturalId
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private Long code;
 	
 	@NotNull(message="A value must be specified")
@@ -109,7 +108,7 @@ public class Withdraw {
     	Instant now = Instant.now();
     	//Database is limited to millisecond precision
     	this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
-    	this.code = new Random().nextLong();
+    	this.code = codeGenerator.incrementAndGet();
     }
     
 	public void setCreatedDate(Instant createdDate) {

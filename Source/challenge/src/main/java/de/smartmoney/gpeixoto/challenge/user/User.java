@@ -1,5 +1,6 @@
 package de.smartmoney.gpeixoto.challenge.user;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,9 +28,11 @@ public class User {
 
 	@NotBlank(message = "An e-mail must be specified")
 	@Email
+	@Column(nullable = false)
 	private String email;
 
 	@NotBlank(message = "A name must be specified")
+	@Column(nullable = false)
 	private String name;
 
 	public User() {

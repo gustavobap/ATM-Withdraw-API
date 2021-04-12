@@ -25,6 +25,14 @@ public class TestHelper {
 		withdraw.setValue(new BigDecimal(value));
 		return withdraw;
 	}
+	
+	public static Withdraw newWithdraw(User user, String value, String fee) {
+		Withdraw withdraw = new Withdraw();
+		withdraw.setUser(user);
+		withdraw.setValue(new BigDecimal(value));
+		withdraw.setFee(new BigDecimal(fee));
+		return withdraw;
+	}
 
 	public static User newUser(String name) {
 		User user = new User();
