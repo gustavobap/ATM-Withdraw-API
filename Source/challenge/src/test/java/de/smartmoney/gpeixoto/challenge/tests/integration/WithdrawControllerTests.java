@@ -93,7 +93,15 @@ public class WithdrawControllerTests extends IntegrationTest {
 	}
 	
 	@Test
-	public void canCreateWithdraw() throws Exception {
+	public void canCreateWithdrawWithUserCode() throws Exception {
+		validWithdraw.getUser().setEmail(null);
+		MockHttpServletResponse response = create(validWithdraw);
+		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+	}
+	
+	@Test
+	public void canCreateWithdrawWithUserEmail() throws Exception {
+		validWithdraw.getUser().setCode(null);
 		MockHttpServletResponse response = create(validWithdraw);
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 	}

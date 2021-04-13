@@ -43,16 +43,19 @@ public class WithdrawServiceTests extends UnitTest {
 		
 		validUser = TestHelper.newUser("test");
 		validUser.setId(123L);
+		validUser.setCode(101L);
 		mockUserFinders(validUser, Optional.of(validUser));
 		
 		nonExistantUser = TestHelper.newUser("non.existant");
 		nonExistantUser.setId(9999L);
+		nonExistantUser.setCode(9999L);
 		mockUserFinders(nonExistantUser, Optional.empty());
 	}
 	
 	private void mockUserFinders(User user, Optional<User> mockResult) {
 		Mockito.when(userRespository.findByEmail(user.getEmail())).thenReturn(mockResult);
-		Mockito.when(userRespository.findById(user.getId())).thenReturn(mockResult);	
+		Mockito.when(userRespository.findById(user.getId())).thenReturn(mockResult);
+		Mockito.when(userRespository.findByCode(user.getCode())).thenReturn(mockResult);
 	}
 	
 	private void assertBusinessException(String message, Executable executable) {
@@ -103,7 +106,7 @@ public class WithdrawServiceTests extends UnitTest {
 	}
 	
 	@Test
-	public void validateUserEmailExists() {
+	public void validateUserExists() {
 		assertBusinessException("User not found", () -> {
 			service.save(TestHelper.newWithdraw(nonExistantUser));
 		});
