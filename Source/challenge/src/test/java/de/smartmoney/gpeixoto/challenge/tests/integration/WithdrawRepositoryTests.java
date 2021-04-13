@@ -5,16 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.smartmoney.gpeixoto.challenge.IntegrationTest;
-import de.smartmoney.gpeixoto.challenge.user.UserRepository;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 
 public class WithdrawRepositoryTests extends IntegrationTest {
 
 	@Autowired
 	private WithdrawRepository repository;
-
-	@Autowired
-	private UserRepository userRespository;
 
 	@Test
 	public void generateNextCode() throws Exception {
