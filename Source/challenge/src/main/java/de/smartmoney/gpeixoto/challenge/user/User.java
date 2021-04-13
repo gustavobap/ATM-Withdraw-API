@@ -1,5 +1,6 @@
 package de.smartmoney.gpeixoto.challenge.user;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -8,14 +9,16 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.NaturalId;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "USER_UNIQUE_EMAIL_CONSTRAINT", columnNames = { "email" }))
-@JsonIgnoreProperties({"withdrawals", "hibernateLazyInitializer", "handler"})
-@JsonPropertyOrder({ "email", "name" })
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonPropertyOrder({ "code", "email", "name" })
 public class User {
 
 	public static final String UNIQUE_EMAIL_CONSTRAINT_NAME = "USER_UNIQUE_EMAIL_CONSTRAINT";
@@ -24,12 +27,18 @@ public class User {
 	@GeneratedValue
 	@JsonIgnore
 	private Long id;
+	
+	@NaturalId
+	@Column(updatable = false, nullable = false, unique = true)
+  	private Long code;
 
 	@NotBlank(message = "An e-mail must be specified")
 	@Email
+	@Column(nullable = false)
 	private String email;
 
 	@NotBlank(message = "A name must be specified")
+	@Column(nullable = false)
 	private String name;
 
 	public User() {
@@ -42,6 +51,14 @@ public class User {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public Long getCode() {
+		return code;
+	}
+	
+	public void setCode(Long code) {
+		this.code = code;
 	}
 
 	public String getEmail() {
@@ -74,9 +91,7 @@ public class User {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof User))
 			return false;
 		User other = (User) obj;
 		if (email == null) {
@@ -96,5 +111,8 @@ public class User {
 			return false;
 		return true;
 	}
+
+	
+
 
 }

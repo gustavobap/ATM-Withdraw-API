@@ -1,6 +1,7 @@
 package de.smartmoney.gpeixoto.challenge.withdraw;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -26,9 +27,9 @@ public class WithdrawController extends ApplicationController {
 		this.service = service;
 	}
 	
-    @GetMapping("{id}")
-    public ResponseEntity<Withdraw> find(@PathVariable("id") Long id) {
-        Optional<Withdraw> withdraw = service.findById(id);
+    @GetMapping("{code}")
+    public ResponseEntity<Withdraw> find(@PathVariable("code") Long code) {
+        Optional<Withdraw> withdraw = service.find(code);
         return ResponseEntity.of(withdraw);
     }
     
@@ -38,11 +39,16 @@ public class WithdrawController extends ApplicationController {
     	withdraw = service.save(withdraw);
     	
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(withdraw.getId())
+                .path("/{code}")
+                .buildAndExpand(withdraw.getCode())
                 .toUri();
         
         return ResponseEntity.created(location).body(withdraw);
+	}
+    
+	@GetMapping()
+	public ResponseEntity<List<Withdraw>> list() {
+		return ResponseEntity.ok().body(service.list());
 	}
 
 }

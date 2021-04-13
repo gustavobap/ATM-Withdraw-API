@@ -1,6 +1,7 @@
 package de.smartmoney.gpeixoto.challenge.withdraw;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import javax.persistence.LockModeType;
 
@@ -23,4 +24,10 @@ public interface WithdrawRepository extends JpaRepository<Withdraw, Long> {
 	public Long countByUser(User user);
 
 	public Long countByUserAndCreatedDateAfter(User user, Instant after);
+
+	public Optional<Withdraw> findByCode(Long code);
+
+	//TODO the specific RDB SQL should be parameterized explicitly
+	@Query(value = "CALL NEXT VALUE FOR code_generator_seq", nativeQuery = true)
+	public Long generateNextCode();
 }
