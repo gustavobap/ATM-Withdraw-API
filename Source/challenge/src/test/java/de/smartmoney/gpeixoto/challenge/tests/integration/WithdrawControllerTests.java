@@ -58,13 +58,19 @@ public class WithdrawControllerTests extends IntegrationTest {
 	@Test
 	public void canGetWithdrawByCode() throws Exception {
 
-		Withdraw expected = repository.save(validWithdraw);
-
-		MockHttpServletResponse response = find(expected);
+		Withdraw withdraw = repository.save(validWithdraw);
+		//fetch the association before the session is closed
+		User user = withdraw.getUser();		
+		withdraw = repository.findById(withdraw.getId()).get();
+		withdraw.setUser(user);
+		
+		String expected = TestHelper.expectedJson(withdraw);
+		
+		MockHttpServletResponse response = find(withdraw);
 
 		Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
 		
-		Assertions.assertEquals(TestHelper.expectedJson(expected), response.getContentAsString());
+		Assertions.assertEquals(expected, response.getContentAsString());
 	}
 
 

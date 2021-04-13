@@ -3,7 +3,6 @@ package de.smartmoney.gpeixoto.challenge.withdraw;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
@@ -29,16 +29,18 @@ import de.smartmoney.gpeixoto.challenge.user.User;
 @JsonPropertyOrder({ "code", "createdDate", "value", "fee" })
 public class Withdraw {
 
-	private static final AtomicLong codeGenerator = new AtomicLong(Instant.now().getNano());
-
 	@Id
 	@GeneratedValue
 	@JsonIgnore
 	private Long id;
 
+	//TODO the specific RDB SQL should be parameterized explicitly
+	// This is a workaround for a spring boot limitation, it does not support generating 
+	// values for attributes not annotated with @Id.
 	@NaturalId
-	@Column(nullable = false, unique = true)
-	private Long code;
+	@GeneratedValue
+	@Column(updatable = false, insertable = false, columnDefinition = "bigint GENERATED ALWAYS AS IDENTITY (START WITH 1)")
+  	private Long code;
 
 	@NotNull(message = "A value must be specified")
 	@DecimalMin(value = "1", message = "must be greater than or equal to $1.00")
@@ -110,7 +112,6 @@ public class Withdraw {
 		Instant now = Instant.now();
 		// Database is limited to millisecond precision
 		this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
-		this.code = codeGenerator.incrementAndGet();
 	}
 
 	public void setCreatedDate(Instant createdDate) {

@@ -48,14 +48,18 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 	}
 	
 	@Test
-	public void registerCreatedCode() throws Exception {
+	public void registerCode() throws Exception {
 		User user = TestHelper.newUser("a");
 		userRespository.save(user);
 
-		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
-		withdraw = repository.findById(withdraw.getId()).get();
+		Withdraw withdraw1 = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
+		Withdraw withdraw2 = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
+		
+		withdraw1 = repository.findById(withdraw1.getId()).get();
+		withdraw2 = repository.findById(withdraw2.getId()).get();
 
-		Assertions.assertNotNull(withdraw.getCode());
+		Assertions.assertEquals(1L, withdraw1.getCode());
+		Assertions.assertEquals(2L, withdraw2.getCode());
 	}	
 
 }
