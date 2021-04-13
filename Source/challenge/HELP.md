@@ -1,16 +1,16 @@
 # Smart Money Challenge
 
-This is a spring boot application developed as a demonstration for Smart Money admission challenge. It consists of an API that receives ATM machines withdrawals requests.
-
-All operations are implemented according to ACID model and are guaranteed to maintain data consistent in a multi-thread or multi-process execution environment.
+This is a spring boot application developed as a demonstration for Smart Money admission challenge. It consists of an API that receives ATM machines withdrawals requests. All operations are implemented according to ACID model and are guaranteed to maintain data consistency in a multi-thread or multi-process execution environment.
 
 ## Running the server
 
 As requested, the distribution has been embedded in a Docker container. 
 
-Extract the zip file, in the root folder you will find `install.sh` and `install.bat` scripts to build and run the container with a single command, please run them from the root folder in the command line. 
+Extract the zip file, in the root folder you will find `install.sh` and `install.bat` scripts to build and run the container with a single command, please run them from the root folder in the command line. There are also uninstall scripts to remove the image and container from docker.
 
-The server will be started automatically with the container on port 8080 and mirrored to the Host machine. Subsequent execution can be done running 
+The server will be started automatically with the container on port 8080 and mirrored to the Host machine. 
+
+Subsequent execution can be done running 
 
     sudo docker start smartmoney_challenge
     
@@ -159,4 +159,11 @@ You can query a Withdraw by supplying it's code
 		}
 	]
 
+### Technical Notes
+
+For purpose of demonstration and easy testing the following configuration are enabled:
+
+- Non Persistent Database (HSQLdb)
+- Pretty Print
+- Logging  SQL
 
