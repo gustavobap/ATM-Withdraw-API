@@ -36,7 +36,9 @@ public class Withdraw {
 
 	//TODO the specific RDB SQL should be parameterized explicitly
 	// This is a workaround for a spring boot limitation, it does not support generating 
-	// values for attributes not annotated with @Id.
+	// values for attributes not annotated with @Id. Using specific RDB SQL is preferable
+	// over a solution running in the JVM context (like AtomicLong), since atomicity is
+	// guaranteed in database level.
 	@NaturalId
 	@GeneratedValue
 	@Column(updatable = false, insertable = false, columnDefinition = "bigint GENERATED ALWAYS AS IDENTITY (START WITH 1)")
