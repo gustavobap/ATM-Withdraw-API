@@ -28,10 +28,6 @@ public interface WithdrawRepository extends JpaRepository<Withdraw, Long> {
 	public Optional<Withdraw> findByCode(Long code);
 
 	//TODO the specific RDB SQL should be parameterized explicitly
-	// This is a workaround for a spring boot limitation, it does not support generating 
-	// values for attributes that are not annotated with @Id. Using specific RDB SQL is preferable
-	// over a solution running in the JVM context (like AtomicLong), since ACID properties can be
-	// guaranteed in database level.
 	@Query(value = "CALL NEXT VALUE FOR code_generator_seq", nativeQuery = true)
 	public Long generateNextCode();
 }

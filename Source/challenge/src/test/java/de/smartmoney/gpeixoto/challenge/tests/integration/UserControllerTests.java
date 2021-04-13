@@ -32,6 +32,7 @@ public class UserControllerTests extends IntegrationTest {
 		validUser = new User();
 		validUser.setName("Test");
 		validUser.setEmail("test@test.com");
+		validUser.setCode(respository.generateNextCode());
 	}
 
 	private MockHttpServletResponse find(User user) throws IOException, Exception {

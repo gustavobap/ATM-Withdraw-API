@@ -45,6 +45,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 		validUser = new User();
 		validUser.setName("Test");
 		validUser.setEmail("test@test.com");
+		validUser.setCode(userRespository.generateNextCode());
 
 		validUser = userRespository.save(validUser);
 
@@ -79,7 +80,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 		//Skip comparison of CreatedDate
 		withdraw.setCreatedDate(createdDate);
 		
-		Assertions.assertEquals(TestHelper.expectedJson(withdraw), response.getContentAsString());
+		Assertions.assertEquals(TestHelper.expectedJson(withdraw), actual);
 	}
 
 	private MockHttpServletResponse create(Withdraw withdraw) throws IOException, Exception {

@@ -74,6 +74,10 @@ public class TestHelper {
 	    if(withdraw.getUser() != null) {
 		    ObjectNode user = mapper.createObjectNode();
 	
+			if(withdraw.getUser().getCode() != null) {
+				user.put("code", withdraw.getUser().getCode());
+			}
+			
 		    user.put("email", withdraw.getUser().getEmail());
 		    user.put("name", withdraw.getUser().getName());
 		    
@@ -100,6 +104,10 @@ public class TestHelper {
 	public static String expectedJson(User user) throws JsonProcessingException {
 	    ObjectNode node = mapper.createObjectNode();
 
+		if(user.getCode() != null) {
+			node.put("code", user.getCode());
+		}
+		
 	    node.put("email", user.getEmail());
 	    node.put("name", user.getName());
 

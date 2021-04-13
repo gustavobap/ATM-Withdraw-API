@@ -6,10 +6,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
-// This is a workaround to overcome a spring limitation, it does not support
-// creating a database sequence to be queried programmatically. This Entity is declared
-// only to trigger the sequence creation, therefore, the database table
-// is unused.
+// This is a workaround for a spring boot limitation, it does not support generating 
+// values for attributes that are not annotated with @Id neither creating a database 
+// sequence to be queried programmatically.
+//
+// https://stackoverflow.com/questions/277630/hibernate-jpa-sequence-non-id
+//
+// Note that using specific RDB SQL is preferable over a solution running in the JVM 
+// context (like AtomicLong), since ACID properties can be guaranteed in database level.
+//
+// This Entity is declared only to generate the sequence creation, therefore, the database 
+// table is unused.
 @Entity
 public class CodeGenerator {
 	

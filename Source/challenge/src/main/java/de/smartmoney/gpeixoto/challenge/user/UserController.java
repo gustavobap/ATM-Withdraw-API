@@ -25,31 +25,31 @@ import de.smartmoney.gpeixoto.challenge.shared.ApplicationController;
 @RequestMapping("api/users")
 public class UserController extends ApplicationController {
 
-	private final UserRepository repository;
+	private final UserService service;
 
-	public UserController(UserRepository repository) {
-		this.repository = repository;
+	public UserController(UserService service) {
+		this.service = service;
 	}
 	
-    @GetMapping("{id}")
-    public ResponseEntity<User> find(@PathVariable("id") Long id) {
-        Optional<User> user= repository.findById(id);
+    @GetMapping("{code}")
+    public ResponseEntity<User> find(@PathVariable("code") Long code) {
+        Optional<User> user= service.find(code);
         return ResponseEntity.of(user);
     }
     
     @PostMapping
     public ResponseEntity<User> create(@Valid @RequestBody User user) {
-    	user = repository.save(user);
+    	user = service.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(user.getId())
+                .path("/{code}")
+                .buildAndExpand(user.getCode())
                 .toUri();
         return ResponseEntity.created(location).body(user);
     }
     
 	@GetMapping()
 	public ResponseEntity<List<User>> list() {
-		return ResponseEntity.ok().body(repository.findAll());
+		return ResponseEntity.ok().body(service.list());
 	}
 
     @ExceptionHandler({DataIntegrityViolationException.class})
