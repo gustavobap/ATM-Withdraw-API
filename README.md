@@ -4,9 +4,9 @@ This is a spring boot application developed as a demonstration for Smart Money a
 
 ## Running the server
 
-As requested, the distribution has been embedded in a Docker container. 
+As requested, the distribution has been embedded in a Docker container. If you don't want to use docker you can deploy the `Docker\challenger.war` file directly to the webserver.
 
-Extract the zip file, in the root folder you will find `install.sh` and `install.bat` scripts to build and run the container with a single command, please run them from the root folder in the command line. There are also uninstall scripts to remove the image and container from docker.
+Extract the zip file, in the root folder you will find a `install.sh` script to build and run the docker container with a single command, please run them from the root folder in the command line. There is also an `uninstall.sh` script to remove the image and container from docker.
 
 The server will be started automatically with the container on port 8080 and mirrored to the Host machine. 
 
