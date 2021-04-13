@@ -22,7 +22,7 @@ public class CodeGenerator {
 	
 	@Id
 	@GeneratedValue(generator="code_generator_seq")
-	@SequenceGenerator(name="code_generator_seq", sequenceName="code_generator_seq", allocationSize=1)
+	@SequenceGenerator(name="code_generator_seq", initialValue = 101, sequenceName="code_generator_seq")
 	@Column(insertable = false, updatable = false)
 	private Long code;
 

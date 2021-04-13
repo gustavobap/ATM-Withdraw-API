@@ -18,10 +18,18 @@ public class CodeGeneratorTests extends IntegrationTest {
 	
 	@Test
 	public void generateNextCode() throws Exception {
-		Assertions.assertEquals(1L, userRepository.generateNextCode());
-		Assertions.assertEquals(2L, withdrawRepository.generateNextCode());
-		Assertions.assertEquals(3L, userRepository.generateNextCode());
-		Assertions.assertEquals(4L, withdrawRepository.generateNextCode());
+		Long old = 101L;
+		Long cur = userRepository.generateNextCode();
+		Assertions.assertTrue(cur.equals(old));
+		old = cur;
+		cur = withdrawRepository.generateNextCode();
+		Assertions.assertTrue(cur > old);
+		old = cur;
+		cur = userRepository.generateNextCode();
+		Assertions.assertTrue(cur > old);
+		old = cur;
+		cur = withdrawRepository.generateNextCode();
+		Assertions.assertTrue(cur > old);
 	}	
 
 }

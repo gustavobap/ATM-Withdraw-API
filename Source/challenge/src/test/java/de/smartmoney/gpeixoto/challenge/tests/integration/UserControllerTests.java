@@ -36,12 +36,12 @@ public class UserControllerTests extends IntegrationTest {
 	}
 
 	private MockHttpServletResponse find(User user) throws IOException, Exception {
-		return mvc.perform(MockMvcRequestBuilders.get("/api/users/" + user.getId()).accept(MediaType.APPLICATION_JSON))
+		return mvc.perform(MockMvcRequestBuilders.get("/api/users/" + user.getCode()).accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
 	}
 
 	@Test
-	public void canGetUserById() throws Exception {
+	public void canGetUserByCode() throws Exception {
 		User expected = respository.save(validUser);
 		MockHttpServletResponse response = find(expected);
 		
