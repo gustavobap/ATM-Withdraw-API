@@ -117,6 +117,7 @@ public class Withdraw {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		result = prime * result + ((createdDate == null) ? 0 : createdDate.hashCode());
 		result = prime * result + ((fee == null) ? 0 : fee.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
@@ -132,6 +133,11 @@ public class Withdraw {
 		if (!(obj instanceof Withdraw))
 			return false;
 		Withdraw other = (Withdraw) obj;
+		if (code == null) {
+			if (other.code != null)
+				return false;
+		} else if (!code.equals(other.code))
+			return false;
 		if (createdDate == null) {
 			if (other.createdDate != null)
 				return false;
