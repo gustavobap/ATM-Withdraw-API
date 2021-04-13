@@ -10,6 +10,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = Replace.ANY)
@@ -20,4 +22,6 @@ public class IntegrationTest {
 	@Autowired
 	protected MockMvc mvc;
 
+	@Autowired
+	protected ObjectMapper mapper;
 }

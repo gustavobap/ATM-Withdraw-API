@@ -3,13 +3,14 @@ package de.smartmoney.gpeixoto.challenge.tests.integration;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
@@ -21,48 +22,53 @@ public class UserControllerTests extends IntegrationTest {
 	@Autowired
 	private UserRepository respository;
 
-	private User validUser;
-
 	public UserControllerTests() {
 
 	}
 
-	@BeforeEach
-	public void setup() {
-		validUser = new User();
-		validUser.setName("Test");
-		validUser.setEmail("test@test.com");
-		validUser.setCode(respository.generateNextCode());
-	}
-
-	private MockHttpServletResponse find(User user) throws IOException, Exception {
-		return mvc.perform(MockMvcRequestBuilders.get("/api/users/" + user.getCode()).accept(MediaType.APPLICATION_JSON))
+	private MockHttpServletResponse find(Long code) throws IOException, Exception {
+		return mvc.perform(MockMvcRequestBuilders.get("/api/users/" + code).accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
 	}
 
 	@Test
 	public void canGetUserByCode() throws Exception {
-		User expected = respository.save(validUser);
-		MockHttpServletResponse response = find(expected);
+		
+		User expected = TestHelper.newUser("test");
+		expected.setCode(555L);
+		expected = respository.save(expected);
+		
+		MockHttpServletResponse response = find(555L);
 		
 		Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
 		Assertions.assertEquals(TestHelper.expectedJson(expected), response.getContentAsString());
 	}
 
-	private MockHttpServletResponse create(User user) throws IOException, Exception {
+	private ObjectNode requestBody(Long code, String name, String email) {
+		ObjectNode node = mapper.createObjectNode();
+		if(code != null)
+			node.put("code", code);
+		if(email != null)
+			node.put("email", email);
+		if(name != null)
+			node.put("name", name);
+		return node;
+	}
+	
+	private MockHttpServletResponse create(ObjectNode node) throws IOException, Exception {
 		return mvc.perform(MockMvcRequestBuilders.post("/api/users").contentType(MediaType.APPLICATION_JSON)
-				.content(TestHelper.expectedJson(user))).andReturn().getResponse();
+				.content(mapper.writeValueAsString(node))).andReturn().getResponse();
 	}
 
 	@Test
 	public void canCreateUser() throws Exception {
-		MockHttpServletResponse response = create(validUser);
+		MockHttpServletResponse response = create(requestBody(101L, "test", "test@test.com"));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 	}
 
 	@Test
 	public void validateAttributesPresence() throws Exception {
-		MockHttpServletResponse response = create(new User());
+		MockHttpServletResponse response = create(requestBody(null, null, null));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
 		String expected = TestHelper.expectedJson("name", "A name must be specified", "email", "An e-mail must be specified");
@@ -72,12 +78,8 @@ public class UserControllerTests extends IntegrationTest {
 
 	@Test
 	public void validateAttributesNotBlank() throws Exception {
-
-		User user = new User();
-		user.setName("");
-		user.setEmail("");
-
-		MockHttpServletResponse response = create(user);
+		
+		MockHttpServletResponse response = create(requestBody(101L, "", ""));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
 		String expected = TestHelper.expectedJson("name", "A name must be specified", "email", "An e-mail must be specified");
@@ -87,10 +89,7 @@ public class UserControllerTests extends IntegrationTest {
 
 	@Test
 	public void validateAttributesEmail() throws Exception {
-
-		validUser.setEmail("nonvalidemail");
-
-		MockHttpServletResponse response = create(validUser);
+		MockHttpServletResponse response = create(requestBody(101L, "test", "nonvalidemail"));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 				
 		Assertions.assertEquals(TestHelper.expectedJson("email", "must be a well-formed email address"), 
@@ -100,13 +99,11 @@ public class UserControllerTests extends IntegrationTest {
 	@Test
 	public void validateAttributesUnique() throws Exception {
 
-		validUser = respository.save(validUser);
+		User user = TestHelper.newUser("test");
+		user.setCode(101L);
+		user = respository.save(user);
 
-		User user = new User();
-		user.setName(validUser.getName());
-		user.setEmail(validUser.getEmail());
-
-		MockHttpServletResponse response = create(user);
+		MockHttpServletResponse response = create(requestBody(102L, "test", user.getEmail()));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
 		Assertions.assertEquals(TestHelper.expectedJson("email", "e-mail is already registered"), 

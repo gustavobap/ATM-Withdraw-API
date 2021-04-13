@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "USER_UNIQUE_EMAIL_CONSTRAINT", columnNames = { "email" }))
-@JsonIgnoreProperties({"withdrawals", "hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @JsonPropertyOrder({ "code", "email", "name" })
 public class User {
 

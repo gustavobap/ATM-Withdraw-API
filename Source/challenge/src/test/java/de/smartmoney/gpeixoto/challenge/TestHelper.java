@@ -47,12 +47,8 @@ public class TestHelper {
 		user.setEmail(name + "@email.com");
 		return user;
 	}
-	
+		
 	public static String expectedJson(Withdraw withdraw) throws JsonProcessingException {
-		return expectedJson(withdraw, true);
-	}
-	
-	public static String expectedJson(Withdraw withdraw, Boolean roundDecimals) throws JsonProcessingException {
 	    
 		ObjectNode node = mapper.createObjectNode();
 
@@ -65,10 +61,10 @@ public class TestHelper {
 			node.put("createdDate", withdraw.getCreatedDate().toString());
 		}
 		if(withdraw.getValue() != null) {
-			node.putRawValue("value", new RawValue(expectedWithdrawValue(withdraw, roundDecimals)));
+			node.putRawValue("value", new RawValue(expectedWithdrawValue(withdraw)));
 		}
 		if(withdraw.getFee() != null) {
-			node.putRawValue("fee", new RawValue(expectedFeeValue(withdraw, roundDecimals)));
+			node.putRawValue("fee", new RawValue(expectedFeeValue(withdraw)));
 		}
 	   
 	    if(withdraw.getUser() != null) {
@@ -77,28 +73,19 @@ public class TestHelper {
 			if(withdraw.getUser().getCode() != null) {
 				user.put("code", withdraw.getUser().getCode());
 			}
-			
-		    user.put("email", withdraw.getUser().getEmail());
-		    user.put("name", withdraw.getUser().getName());
-		    
+					    
 		    node.set("user", user);
 	    }
 	    
 	    return write(node);
 	}
 	
-	private static String expectedWithdrawValue(Withdraw withdraw, Boolean roundDecimals) {
-		BigDecimal value = withdraw.getValue();
-		if(roundDecimals)
-			value = value.setScale(2, RoundingMode.HALF_EVEN);
-		return value.toString();
+	private static String expectedWithdrawValue(Withdraw withdraw) {
+		return withdraw.getValue().setScale(2, RoundingMode.HALF_EVEN).toString();
 	}
 
-	private static String expectedFeeValue(Withdraw withdraw, Boolean roundDecimals) {
-		BigDecimal value = withdraw.getFee();
-		if(roundDecimals)
-			value = value.setScale(5, RoundingMode.HALF_EVEN);
-		return value.toString();
+	private static String expectedFeeValue(Withdraw withdraw) {
+		return withdraw.getFee().setScale(5, RoundingMode.HALF_EVEN).toString();
 	}
 
 	public static String expectedJson(User user) throws JsonProcessingException {

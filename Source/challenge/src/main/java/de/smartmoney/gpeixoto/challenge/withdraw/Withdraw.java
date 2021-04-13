@@ -18,12 +18,13 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.NaturalId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import de.smartmoney.gpeixoto.challenge.user.User;
 
 @Entity
-@JsonPropertyOrder({ "code", "createdDate", "value", "fee" })
+@JsonPropertyOrder({ "code", "createdDate", "value", "fee", "user"})
 public class Withdraw {
 
 	@Id
@@ -47,6 +48,7 @@ public class Withdraw {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnoreProperties(value = {"email", "name"}, allowSetters = true)
 	private User user;
 
 	@Column(nullable = false)

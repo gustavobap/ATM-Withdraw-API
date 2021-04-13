@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.user.User;
@@ -34,8 +36,6 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 	private User validUser;
 
-	private Withdraw validWithdraw;
-
 	public WithdrawControllerTests() {
 
 	}
@@ -48,27 +48,22 @@ public class WithdrawControllerTests extends IntegrationTest {
 		validUser.setCode(userRespository.generateNextCode());
 
 		validUser = userRespository.save(validUser);
-
-		validWithdraw = new Withdraw();
-		validWithdraw.setUser(validUser);
-		validWithdraw.setValue(new BigDecimal("50.00"));
-		validWithdraw.setFee(new BigDecimal("1.50"));
-		validWithdraw.setCode(repository.generateNextCode());
-		validWithdraw.setCreatedDate(Instant.now());
 	}
 
-	private MockHttpServletResponse find(Withdraw withdraw) throws IOException, Exception {
+	private MockHttpServletResponse find(Long code) throws IOException, Exception {
 		return mvc.perform(
-				MockMvcRequestBuilders.get("/api/withdrawals/" + withdraw.getCode()).accept(MediaType.APPLICATION_JSON))
+				MockMvcRequestBuilders.get("/api/withdrawals/" + code).accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
 	}
-
+	
 	@Test
 	public void canGetWithdrawByCode() throws Exception {
 
-		Withdraw withdraw = repository.save(validWithdraw);
+		Withdraw withdraw = TestHelper.newWithdraw(validUser, "50", "1.5", 101L);
+		withdraw.setCreatedDate(Instant.now());
+		withdraw = repository.save(withdraw);
 				
-		MockHttpServletResponse response = find(withdraw);
+		MockHttpServletResponse response = find(withdraw.getCode());
 
 		Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
 		
@@ -82,34 +77,58 @@ public class WithdrawControllerTests extends IntegrationTest {
 		
 		Assertions.assertEquals(TestHelper.expectedJson(withdraw), actual);
 	}
+	
+	private ObjectNode requestBody(String value, String userEmail) {
+		return requestBody(value, userEmail, null);
+	}
+	
+	private ObjectNode requestBody(String value, Long userCode) {
+		return requestBody(value, null, userCode);
+	}
+	
+	private ObjectNode requestBody(String value, String userEmail, Long userCode) {
+		ObjectNode node = mapper.createObjectNode();
 
-	private MockHttpServletResponse create(Withdraw withdraw) throws IOException, Exception {
+		if(value != null)
+			node.put("value", value);
+
+	    ObjectNode user = mapper.createObjectNode();
+	    
+	    if(userCode != null)
+	    	user.put("code", userCode);
+	    if(userEmail != null)
+	    	user.put("email", userEmail);
+				    
+	    node.set("user", user);
+	    
+	    return node;
+	}
+	
+	private MockHttpServletResponse create(ObjectNode node) throws Exception {		
+		
 		return mvc.perform(
 				MockMvcRequestBuilders.post("/api/withdrawals")
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(TestHelper.expectedJson(withdraw, false))
+					.content(mapper.writeValueAsString(node))
 				)
 				.andReturn().getResponse();
 	}
 	
 	@Test
 	public void canCreateWithdrawWithUserCode() throws Exception {
-		validWithdraw.getUser().setEmail(null);
-		MockHttpServletResponse response = create(validWithdraw);
+		MockHttpServletResponse response = create(requestBody("50", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 	}
 	
 	@Test
 	public void canCreateWithdrawWithUserEmail() throws Exception {
-		validWithdraw.getUser().setCode(null);
-		MockHttpServletResponse response = create(validWithdraw);
+		MockHttpServletResponse response = create(requestBody("50", validUser.getEmail()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 	}
 	
 	@Test()
 	public void setFeeAmount() throws Exception {
-		validWithdraw.setValue(new BigDecimal("50.00"));
-		MockHttpServletResponse response = create(validWithdraw);
+		MockHttpServletResponse response = create(requestBody("50.00", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());		
 
 		Assertions.assertEquals(1, repository.count());		
@@ -119,8 +138,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 	
 	@Test()
 	public void setFeeAmountWithBigPrecision() throws Exception {
-		validWithdraw.setValue(new BigDecimal("43.99"));
-		MockHttpServletResponse response = create(validWithdraw);
+		MockHttpServletResponse response = create(requestBody("43.99", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());		
 
 		Assertions.assertEquals(1, repository.count());
@@ -130,7 +148,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 	@Test
 	public void validateAttributesPresence() throws Exception {
-		MockHttpServletResponse response = create(new Withdraw());
+		MockHttpServletResponse response = create(requestBody(null, null, null));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
 		Assertions.assertEquals(TestHelper.expectedJson("value", "A value must be specified"), 
@@ -139,11 +157,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 	@Test
 	public void validateMinimumValue() throws Exception {
-		User user = userRespository.save(validUser);
-
-		Withdraw withdraw = TestHelper.newWithdraw(user, "0.99");
-
-		MockHttpServletResponse response = create(withdraw);
+		MockHttpServletResponse response = create(requestBody("0.99", validUser.getCode()));
 
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
@@ -153,10 +167,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 	
 	@Test
 	public void validateValuePrecision() throws Exception {
-		User user = userRespository.save(validUser);
-
-		Withdraw withdraw = TestHelper.newWithdraw(user, "40.999");
-		MockHttpServletResponse response = create(withdraw);
+		MockHttpServletResponse response = create(requestBody("40.999", validUser.getCode()));
 
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		
@@ -167,29 +178,21 @@ public class WithdrawControllerTests extends IntegrationTest {
 	@Test
 	public void validateMaximumValue() throws Exception {
 
-		validWithdraw.setValue(new BigDecimal("50.01"));
-
-		MockHttpServletResponse response = create(validWithdraw);
+		MockHttpServletResponse response = create(requestBody("50.01", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 
 		Assertions.assertEquals(TestHelper.expectedJson("value", "Your first withdraw is limited to $50.00"), 
 				response.getContentAsString());
 		
-		validWithdraw.setValue(new BigDecimal("50.00"));
-
-		response = create(validWithdraw);
+		response = create(requestBody("50.00", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
-		validWithdraw.setValue(new BigDecimal("300.01"));
-
-		response = create(validWithdraw);
+		response = create(requestBody("300.01", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 		Assertions.assertEquals(TestHelper.expectedJson("value", "Your withdrawals are limited to $300.00"),
 				response.getContentAsString());
 
-		validWithdraw.setValue(new BigDecimal("300.00"));
-
-		response = create(validWithdraw);
+		response = create(requestBody("300.00", validUser.getCode()));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 
 		Assertions.assertEquals(2, repository.count());
