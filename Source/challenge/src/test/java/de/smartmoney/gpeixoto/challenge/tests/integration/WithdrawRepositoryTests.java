@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.smartmoney.gpeixoto.challenge.IntegrationTest;
-import de.smartmoney.gpeixoto.challenge.TestHelper;
-import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 
@@ -19,24 +17,7 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 	private UserRepository userRespository;
 
 	@Test
-	public void canCountByUser() throws Exception {
-
-		User userA = TestHelper.newUser("a");
-		userRespository.save(userA);
-
-		User userB = TestHelper.newUser("b");
-		userRespository.save(userB);
-
-		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50", repository.generateNextCode()));
-		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50", repository.generateNextCode()));
-		repository.save(TestHelper.newWithdraw(userB, "50.00", "1.50", repository.generateNextCode()));
-
-		Assertions.assertEquals(2L, repository.countByUser(userA));
-		Assertions.assertEquals(1L, repository.countByUser(userB));
-	}
-	
-	@Test
-	public void registerCode() throws Exception {
+	public void generateNextCode() throws Exception {
 		Assertions.assertEquals(1L, repository.generateNextCode());
 		Assertions.assertEquals(2L, repository.generateNextCode());
 		Assertions.assertEquals(3L, repository.generateNextCode());
