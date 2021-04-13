@@ -28,9 +28,9 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 		User userB = TestHelper.newUser("b");
 		userRespository.save(userB);
 
-		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50"));
-		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50"));
-		repository.save(TestHelper.newWithdraw(userB, "50.00", "1.50"));
+		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50", repository.generateNextCode()));
+		repository.save(TestHelper.newWithdraw(userA, "50.00", "1.50", repository.generateNextCode()));
+		repository.save(TestHelper.newWithdraw(userB, "50.00", "1.50", repository.generateNextCode()));
 
 		Assertions.assertEquals(2L, repository.countByUser(userA));
 		Assertions.assertEquals(1L, repository.countByUser(userB));
@@ -41,7 +41,7 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 		User user = TestHelper.newUser("a");
 		userRespository.save(user);
 
-		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
+		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50", repository.generateNextCode()));
 		withdraw = repository.findById(withdraw.getId()).get();
 
 		Assertions.assertNotNull(withdraw.getCreatedDate());
@@ -49,17 +49,9 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 	
 	@Test
 	public void registerCode() throws Exception {
-		User user = TestHelper.newUser("a");
-		userRespository.save(user);
-
-		Withdraw withdraw1 = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
-		Withdraw withdraw2 = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50"));
-		
-		withdraw1 = repository.findById(withdraw1.getId()).get();
-		withdraw2 = repository.findById(withdraw2.getId()).get();
-
-		Assertions.assertEquals(1L, withdraw1.getCode());
-		Assertions.assertEquals(2L, withdraw2.getCode());
+		Assertions.assertEquals(1L, repository.generateNextCode());
+		Assertions.assertEquals(2L, repository.generateNextCode());
+		Assertions.assertEquals(3L, repository.generateNextCode());
 	}	
 
 }

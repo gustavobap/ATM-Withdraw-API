@@ -27,11 +27,12 @@ public class TestHelper {
 		return withdraw;
 	}
 	
-	public static Withdraw newWithdraw(User user, String value, String fee) {
+	public static Withdraw newWithdraw(User user, String value, String fee, Long code) {
 		Withdraw withdraw = new Withdraw();
 		withdraw.setUser(user);
 		withdraw.setValue(new BigDecimal(value));
 		withdraw.setFee(new BigDecimal(fee));
+		withdraw.setCode(code);
 		return withdraw;
 	}
 

@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
@@ -34,14 +33,8 @@ public class Withdraw {
 	@JsonIgnore
 	private Long id;
 
-	//TODO the specific RDB SQL should be parameterized explicitly
-	// This is a workaround for a spring boot limitation, it does not support generating 
-	// values for attributes not annotated with @Id. Using specific RDB SQL is preferable
-	// over a solution running in the JVM context (like AtomicLong), since atomicity is
-	// guaranteed in database level.
 	@NaturalId
-	@GeneratedValue
-	@Column(updatable = false, insertable = false, columnDefinition = "bigint GENERATED ALWAYS AS IDENTITY (START WITH 1)")
+	@Column(updatable = false, nullable = false, unique = true)
   	private Long code;
 
 	@NotNull(message = "A value must be specified")

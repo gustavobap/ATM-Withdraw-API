@@ -47,6 +47,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 		validWithdraw.setUser(validUser);
 		validWithdraw.setValue(new BigDecimal("50.00"));
 		validWithdraw.setFee(new BigDecimal("1.50"));
+		validWithdraw.setCode(repository.generateNextCode());
 	}
 
 	private MockHttpServletResponse find(Withdraw withdraw) throws IOException, Exception {
@@ -59,10 +60,6 @@ public class WithdrawControllerTests extends IntegrationTest {
 	public void canGetWithdrawByCode() throws Exception {
 
 		Withdraw withdraw = repository.save(validWithdraw);
-		//fetch the association before the session is closed
-		User user = withdraw.getUser();		
-		withdraw = repository.findById(withdraw.getId()).get();
-		withdraw.setUser(user);
 		
 		String expected = TestHelper.expectedJson(withdraw);
 		

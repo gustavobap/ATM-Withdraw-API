@@ -66,6 +66,8 @@ public class WithdrawService {
 		}
 		
 		withdraw.setFee(feeValue(withdraw, percentage));
+		
+		withdraw.setCode(repository.generateNextCode());
 
 		return repository.save(withdraw);
 	}
