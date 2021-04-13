@@ -2,11 +2,13 @@ package de.smartmoney.gpeixoto.challenge.tests.integration;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -26,6 +28,9 @@ public class WithdrawControllerTests extends IntegrationTest {
 
 	@Autowired
 	private UserRepository userRespository;
+	
+	@Autowired
+	private JacksonTester<Withdraw> jackson;
 
 	private User validUser;
 
@@ -48,6 +53,7 @@ public class WithdrawControllerTests extends IntegrationTest {
 		validWithdraw.setValue(new BigDecimal("50.00"));
 		validWithdraw.setFee(new BigDecimal("1.50"));
 		validWithdraw.setCode(repository.generateNextCode());
+		validWithdraw.setCreatedDate(Instant.now());
 	}
 
 	private MockHttpServletResponse find(Withdraw withdraw) throws IOException, Exception {
@@ -60,17 +66,21 @@ public class WithdrawControllerTests extends IntegrationTest {
 	public void canGetWithdrawByCode() throws Exception {
 
 		Withdraw withdraw = repository.save(validWithdraw);
-		
-		String expected = TestHelper.expectedJson(withdraw);
-		
+				
 		MockHttpServletResponse response = find(withdraw);
 
 		Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
 		
-		Assertions.assertEquals(expected, response.getContentAsString());
+		String actual = response.getContentAsString();
+		Instant createdDate = jackson.parseObject(actual).getCreatedDate();
+		
+		TestHelper.assertCloseToNow(createdDate);
+		
+		//Skip comparison of CreatedDate
+		withdraw.setCreatedDate(createdDate);
+		
+		Assertions.assertEquals(TestHelper.expectedJson(withdraw), response.getContentAsString());
 	}
-
-
 
 	private MockHttpServletResponse create(Withdraw withdraw) throws IOException, Exception {
 		return mvc.perform(

@@ -2,7 +2,6 @@ package de.smartmoney.gpeixoto.challenge.withdraw;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
@@ -100,13 +98,6 @@ public class Withdraw {
 
 	public Instant getCreatedDate() {
 		return createdDate;
-	}
-
-	@PrePersist
-	public void prePersist() {
-		Instant now = Instant.now();
-		// Database is limited to millisecond precision
-		this.createdDate = now.truncatedTo(ChronoUnit.MILLIS);
 	}
 
 	public void setCreatedDate(Instant createdDate) {

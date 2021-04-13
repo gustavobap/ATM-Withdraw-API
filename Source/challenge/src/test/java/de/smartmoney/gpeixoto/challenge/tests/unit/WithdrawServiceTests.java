@@ -132,6 +132,13 @@ public class WithdrawServiceTests extends UnitTest {
 		checkFeeValue("300.00", "3.00", 4);
 	}
 	
+   @Test
+   public void registerCreatedDate() throws Exception {
+       Withdraw withdraw = TestHelper.newWithdraw(validUser, "50.00");
+       service.save(withdraw);
+       TestHelper.assertCloseToNow(withdraw.getCreatedDate());
+   }
+	
 	@Test
 	public void validateMaximumFirstValue(){
 	

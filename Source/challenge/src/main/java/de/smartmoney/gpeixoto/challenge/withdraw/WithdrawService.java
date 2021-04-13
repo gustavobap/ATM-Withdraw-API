@@ -68,6 +68,9 @@ public class WithdrawService {
 		withdraw.setFee(feeValue(withdraw, percentage));
 		
 		withdraw.setCode(repository.generateNextCode());
+		
+		// HSQL Database is limited to millisecond precision
+		withdraw.setCreatedDate(Instant.now().truncatedTo(ChronoUnit.MILLIS));
 
 		return repository.save(withdraw);
 	}

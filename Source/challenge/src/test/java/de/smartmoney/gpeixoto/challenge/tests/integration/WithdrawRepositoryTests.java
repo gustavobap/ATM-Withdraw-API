@@ -8,7 +8,6 @@ import de.smartmoney.gpeixoto.challenge.IntegrationTest;
 import de.smartmoney.gpeixoto.challenge.TestHelper;
 import de.smartmoney.gpeixoto.challenge.user.User;
 import de.smartmoney.gpeixoto.challenge.user.UserRepository;
-import de.smartmoney.gpeixoto.challenge.withdraw.Withdraw;
 import de.smartmoney.gpeixoto.challenge.withdraw.WithdrawRepository;
 
 public class WithdrawRepositoryTests extends IntegrationTest {
@@ -34,17 +33,6 @@ public class WithdrawRepositoryTests extends IntegrationTest {
 
 		Assertions.assertEquals(2L, repository.countByUser(userA));
 		Assertions.assertEquals(1L, repository.countByUser(userB));
-	}
-
-	@Test
-	public void registerCreatedDate() throws Exception {
-		User user = TestHelper.newUser("a");
-		userRespository.save(user);
-
-		Withdraw withdraw = repository.save(TestHelper.newWithdraw(user, "50.00", "1.50", repository.generateNextCode()));
-		withdraw = repository.findById(withdraw.getId()).get();
-
-		Assertions.assertNotNull(withdraw.getCreatedDate());
 	}
 	
 	@Test

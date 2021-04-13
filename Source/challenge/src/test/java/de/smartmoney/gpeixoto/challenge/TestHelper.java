@@ -3,6 +3,11 @@ package de.smartmoney.gpeixoto.challenge;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.InvalidParameterException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -117,6 +122,12 @@ public class TestHelper {
 	
 	private static String write(ObjectNode node) throws JsonProcessingException {
 		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+	}
+
+	public static void assertCloseToNow(Instant createdDate) {
+		Assertions.assertNotNull(createdDate);
+		Long seconds = Duration.between(createdDate, Instant.now()).get(ChronoUnit.SECONDS);
+		Assertions.assertTrue(seconds >= 0 && seconds <= 1);
 	}
 
 }
