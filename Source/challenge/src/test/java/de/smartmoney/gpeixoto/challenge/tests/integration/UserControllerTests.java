@@ -62,7 +62,7 @@ public class UserControllerTests extends IntegrationTest {
 
 	@Test
 	public void canCreateUser() throws Exception {
-		MockHttpServletResponse response = create(requestBody(101L, "test", "test@test.com"));
+		MockHttpServletResponse response = create(requestBody(null, "test", "test@test.com"));
 		Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatus());
 	}
 
