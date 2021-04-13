@@ -40,7 +40,7 @@ public class WithdrawController extends ApplicationController {
     	
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{code}")
-                .buildAndExpand(withdraw.getId())
+                .buildAndExpand(withdraw.getCode())
                 .toUri();
         
         return ResponseEntity.created(location).body(withdraw);
