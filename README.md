@@ -181,7 +181,3 @@ To remove the Docker container and image:
 ```bash
 ./uninstall.sh
 ```
-
----
-
-This project demonstrates a reliable, scalable solution for managing ATM withdrawals and user data. It provides easy deployment and testing capabilities, making it an ideal candidate for evaluating software design and implementation skills.
