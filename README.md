@@ -1,169 +1,187 @@
-# Smart Money Challenge
 
-This is a spring boot application developed as a demonstration for Smart Money admission challenge. It consists of an API that receives ATM machines withdrawals requests. All operations are implemented according to ACID model and are guaranteed to maintain data consistency in a multi-thread or multi-process execution environment.
+# ATM Withdraw API
 
-## Running the server
+This repository contains a Spring Boot application developed as part of the Smart Money admission challenge. The API handles ATM withdrawal requests while adhering to the ACID model, ensuring data consistency in multi-threaded or multi-process environments.
 
-As requested, the distribution has been embedded in a Docker container. If you don't want to use docker you can deploy the `Docker\challenger.war` file directly to the webserver.
+---
 
-Extract the zip file, in the root folder you will find a `install.sh` script to build and run the docker container with a single command, please run them from the root folder in the command line. There is also an `uninstall.sh` script to remove the image and container from docker.
+## Getting Started
 
-The server will be started automatically with the container on port 8080 and mirrored to the Host machine. 
+### Running the Server
 
-Subsequent execution can be done running 
+The project includes a Docker container for easy deployment. Alternatively, the provided `.war` file can be deployed manually.
 
-    sudo docker start smartmoney_challenge
-    
-## Guide
+#### **Using Docker**
+1. Extract the repository zip file.
+2. Navigate to the root folder and execute the following script:
+   ```bash
+   ./install.sh
+   ```
+3. The server will start automatically on port `8080`.
 
-There are two REST Resources, `User` and `Withdraw`, operated through three end-points each:
+4. To stop/restart the server:
+   ```bash
+   sudo docker start smartmoney_challenge
+   ```
 
-    User
-    
-    create:	POST /api/users
-      find:	GET /api/users/{code}
-      list:	GET /api/users
+#### **Manual Deployment**
+- Deploy the `challenge.war` file from the `Docker/` directory to your web server of choice.
 
-	Withdraw
-	
-    create:	POST /api/withdrawals
-      find:	GET /api/withdrawals/{code}
-      list:	GET /api/withdrawals
-      
+---
 
-### Create User 
+## API Endpoints
 
-On successful result a 'code' property is generated, it is a unique key of integer type.
+The API consists of two main resources: `User` and `Withdraw`. Each resource provides endpoints for creating, retrieving, and listing data.
 
-	Request: POST /api/users
-	 
+---
+
+### **User Resource**
+
+#### Create User
+- **Endpoint**: `POST /api/users`
+- **Request Body**:
+  ```json
+  {
+    "name": "Test",
+    "email": "test@test.com"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "code": 101,
+    "email": "test@test.com",
+    "name": "Test"
+  }
+  ```
+
+#### Find User
+- **Endpoint**: `GET /api/users/{code}`
+- **Response**:
+  ```json
+  {
+    "code": 555,
+    "email": "test@email.com",
+    "name": "test"
+  }
+  ```
+
+#### List Users
+- **Endpoint**: `GET /api/users`
+- **Response**:
+  ```json
+  [
     {
-    	"name": "Test",
-    	"email": "test@test.com"
+      "code": 1,
+      "email": "test@email.com",
+      "name": "Test 1"
+    },
+    {
+      "code": 2,
+      "email": "test2@email.com",
+      "name": "Test 2"
     }
+  ]
+  ```
 
-    Response:
-	 
+---
+
+### **Withdraw Resource**
+
+#### Create Withdraw
+- **Endpoint**: `POST /api/withdrawals`
+- **Request Body**:
+  ```json
+  {
+    "value": 50,
+    "user": {
+      "email": "test@email.com"
+    }
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "code": 151,
+    "createdDate": "2020-12-01T07:25:53.534Z",
+    "value": 50,
+    "fee": 1.5,
+    "user": {
+      "code": 101
+    }
+  }
+  ```
+
+#### Find Withdraw
+- **Endpoint**: `GET /api/withdrawals/{code}`
+- **Response**:
+  ```json
+  {
+    "code": 151,
+    "createdDate": "2020-12-01T07:25:53.534Z",
+    "value": 50,
+    "fee": 1.5,
+    "user": {
+      "code": 101
+    }
+  }
+  ```
+
+#### List Withdrawals
+- **Endpoint**: `GET /api/withdrawals`
+- **Response**:
+  ```json
+  [
     {
-		"code" : 101,
-		"email" : "test@test.com",
-		"name" : "Test"
-	} 
-
-### Find User
-
-You query an User by supplying it's code
-
-    Request: GET /api/users/555
-
-    Response:
-    
+      "code": 151,
+      "createdDate": "2021-04-11T01:41:58.927Z",
+      "value": 33.34,
+      "fee": 1.00020,
+      "user": {
+        "code": 101
+      }
+    },
     {
-		"code" : 555,
-		"email" : "test@email.com",
-		"name" : "test"
-	}
+      "code": 201,
+      "createdDate": "2021-04-10T03:42:01.967Z",
+      "value": 33.34,
+      "fee": 1.00020,
+      "user": {
+        "code": 555
+      }
+    }
+  ]
+  ```
 
-### List Users
+---
 
-    Request: GET /api/users
+## Validation Rules
 
-	Response:
-	
-    [
-    	{
-			"code" : 1,
-			"email" : "test@email.com",
-			"name" : "Test 1"
-		},
-		{
-			"code" : 2,
-			"email" : "test2@email.com",
-			"name" : "Test 2"
-		}
-	]
+- **Withdraw Value**:
+  - Must have a maximum of 2 decimal places.
+  - Excess precision will result in a validation error.
 
-### Create Withdraw 
+- **Fee Calculation**:
+  - Returned with a maximum of 5 decimal places.
+  - Rounded as necessary for precision.
 
-To create a Withdraw you must provide the associated User code OR email.
+---
 
-The withdraw value must have a maximum scale of 2 decimal places, otherwise a validation error is returned.
+## Technical Notes
 
-On successful result, a fee will be calculated with a maximum scale of 5 decimal places, it will be rounded if necessary. 
+- **Database**: The application uses an in-memory **HSQLdb** for quick testing and easy setup.
+- **Logging**: SQL statements and API responses are logged for debugging and transparency.
+- **Pretty Print**: API responses are formatted for readability.
 
-A code key is also generate to identify the newly created Withdraw.
-	
-	Request: POST /api/withdrawals
-	
-	{
-		"value" : 50,
-		"user" : {
-			"email" : "test@email.com"
-		}
-	}
+---
 
-	Response:
-	
-	{
-		"code" : 151,
-		"createdDate" : "2020-12-01T07:25:53.534Z",
-		"value" : 50,
-		"fee" : 1.5,
-		"user" : {
-			"code" : 101
-		}
-	}
+## Uninstalling
 
-### Find Withdraw
+To remove the Docker container and image:
+```bash
+./uninstall.sh
+```
 
-You can query a Withdraw by supplying it's code
+---
 
-    Request: GET /api/withdrawals/151
-
-    Response:
-	 
-	{
-		"code" : 151,
-		"createdDate" : "2020-12-01T07:25:53.534Z",
-		"value" : 50,
-		"fee" : 1.5,
-		"user" : {
-			"code" : 101
-		}
-	}
-
-### List Withdrawals
-
-    Request: GET /api/withdrawals
-
-	Response:
-	
-	[
-		{
-			"code" : 151,
-			"createdDate" : "2021-04-11T01:41:58.927Z",
-			"value" : 33.34,
-			"fee" : 1.00020,
-			"user" : {
-				"code" : 101
-			}
-		}, 
-		{
-		  	"code" : 201,
-		  	"createdDate" : "2021-04-10T03:42:01.967Z",
-		  	"value" : 33.34,
-		  	"fee" : 1.00020,
-		  	"user" : {
-		    	"code" : 555
-		  	}
-		}
-	]
-
-### Technical Notes
-
-For purpose of demonstration and easy testing the following configuration are enabled:
-
-- Non Persistent Database (HSQLdb)
-- Pretty Print
-- Logging  SQL
-
+This project demonstrates a reliable, scalable solution for managing ATM withdrawals and user data. It provides easy deployment and testing capabilities, making it an ideal candidate for evaluating software design and implementation skills.
